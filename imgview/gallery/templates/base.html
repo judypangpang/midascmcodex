@@ -40,6 +40,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      flex-wrap: nowrap;
     }
 
     .brand {
@@ -65,50 +66,131 @@
       align-items: center;
       gap: 10px;
     }
-
-    .menu {
+    .topbar-head {
       display: flex;
-      gap: 12px;
       align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      gap: 10px;
     }
 
-    .menu a {
+    .menu-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: clamp(8px, 1.6vw, 14px);
+      align-items: center;
+      flex-wrap: nowrap;
+    }
+
+    .menu-item {
+      margin: 0;
+      padding: 0;
+      flex: 0 0 auto;
+    }
+
+    .menu-list a {
       text-decoration: none;
       color: var(--text);
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: 1px solid transparent;
+      padding: 2px 0;
+      display: inline-block;
+      font-size: clamp(12px, 1.3vw, 14px);
+      line-height: 1.2;
+      white-space: nowrap;
     }
 
-    .menu a:hover {
-      border-color: var(--border);
-      background: #fff;
+    .menu-list a:hover {
+      color: var(--accent);
     }
 
-    .menu a.active {
-      color: #fff;
-      background: var(--accent);
-      border-color: var(--accent);
+    .menu-list a.active {
+      color: var(--accent);
+      font-weight: 700;
     }
 
-    .menu form { margin: 0; }
-    .menu button {
+    .menu-list form { margin: 0; }
+    .menu-list button {
       text-decoration: none;
       color: var(--text);
-      padding: 8px 10px;
-      border-radius: 6px;
-      border: 1px solid transparent;
+      padding: 2px 0;
+      border: 0;
       background: transparent;
       cursor: pointer;
       font: inherit;
+      font-size: clamp(12px, 1.3vw, 14px);
+      line-height: 1.2;
+      white-space: nowrap;
     }
-    .menu button:hover {
-      border-color: var(--border);
-      background: #fff;
+    .menu-list button:hover {
+      color: var(--accent);
     }
     .user-name {
       font-size: 14px;
       color: #555;
+    }
+    .menu-toggle {
+      display: none;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .menu {
+        width: 100%;
+        display: none;
+      }
+
+      .menu.is-open {
+        display: block;
+      }
+
+      .menu-list {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-top: 4px;
+        gap: 6px;
+      }
+
+      .menu-list a {
+        font-size: 13px;
+        padding: 2px 0;
+      }
+
+      .menu-list button {
+        font-size: 13px;
+        padding: 2px 0;
+      }
+
+      .menu-toggle {
+        display: inline-block;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .menu {
+        min-width: 0;
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 980px) {
+      .user-name {
+        display: none;
+      }
     }
   </style>
   {% block extra_head %}{% endblock %}
@@ -116,25 +198,42 @@
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="brand-wrap">
-        <a class="brand" href="{% url 'image_list' %}">MIDASCM</a>
-        {% if request.user.is_authenticated %}
-          <span class="user-name">{{ request.user.username }}</span>
-        {% endif %}
+      <div class="topbar-head">
+        <div class="brand-wrap">
+          <a class="brand" href="{% url 'image_list' %}">MIDASCM</a>
+          {% if request.user.is_authenticated %}
+            <span class="user-name">{{ request.user.username }}</span>
+          {% endif %}
+        </div>
+        <button class="menu-toggle" type="button" id="menuToggle" aria-label="메뉴 열기" aria-expanded="false">☰</button>
       </div>
-      <nav class="menu">
-        <a href="{% url 'image_list' %}" class="{% if request.resolver_match.url_name == 'image_list' %}active{% endif %}">목록</a>
-        <a href="{% url 'image_upload' %}" class="{% if request.resolver_match.url_name == 'image_upload' %}active{% endif %}">업로드</a>
-        <a href="{% url 'category_list' %}" class="{% if request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' %}active{% endif %}">분류관리</a>
-        {% if request.user.is_authenticated %}
-          <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit">로그아웃</button>
-          </form>
-        {% else %}
-          <a href="{% url 'signup' %}" class="{% if request.resolver_match.url_name == 'signup' %}active{% endif %}">회원가입</a>
-          <a href="{% url 'login' %}" class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}">로그인</a>
-        {% endif %}
+      <nav class="menu" id="mainMenu">
+        <ul class="menu-list">
+          <li class="menu-item">
+            <a href="{% url 'image_list' %}" class="{% if request.resolver_match.url_name == 'image_list' %}active{% endif %}">목록</a>
+          </li>
+          <li class="menu-item">
+            <a href="{% url 'image_upload' %}" class="{% if request.resolver_match.url_name == 'image_upload' %}active{% endif %}">업로드</a>
+          </li>
+          <li class="menu-item">
+            <a href="{% url 'category_list' %}" class="{% if request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' %}active{% endif %}">분류관리</a>
+          </li>
+          {% if request.user.is_authenticated %}
+            <li class="menu-item">
+              <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit">로그아웃</button>
+              </form>
+            </li>
+          {% else %}
+            <li class="menu-item">
+              <a href="{% url 'signup' %}" class="{% if request.resolver_match.url_name == 'signup' %}active{% endif %}">회원가입</a>
+            </li>
+            <li class="menu-item">
+              <a href="{% url 'login' %}" class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}">로그인</a>
+            </li>
+          {% endif %}
+        </ul>
       </nav>
     </div>
   </header>
@@ -142,5 +241,26 @@
   <main class="container">
     {% block content %}{% endblock %}
   </main>
+  <script>
+    (function () {
+      const menu = document.getElementById("mainMenu");
+      const toggle = document.getElementById("menuToggle");
+      if (!menu || !toggle) {
+        return;
+      }
+
+      toggle.addEventListener("click", function () {
+        const opened = menu.classList.toggle("is-open");
+        toggle.setAttribute("aria-expanded", String(opened));
+      });
+
+      window.addEventListener("resize", function () {
+        if (window.innerWidth > 768) {
+          menu.classList.remove("is-open");
+          toggle.setAttribute("aria-expanded", "false");
+        }
+      });
+    })();
+  </script>
 </body>
 </html>

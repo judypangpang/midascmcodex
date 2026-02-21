@@ -6,6 +6,20 @@
 <style>
   .upload-box { border: 1px solid #ddd; border-radius: 8px; padding: 16px; background: #fff; }
   .upload-box button { margin-top: 12px; padding: 8px 14px; }
+  .upload-box input,
+  .upload-box select {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .upload-box {
+      padding: 12px;
+    }
+    .upload-box button {
+      width: 100%;
+    }
+  }
 </style>
 {% endblock %}
 
