@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}회원가입{% endblock %}
+
+{% block extra_head %}
+<style>
+  .signup-box {
+    max-width: 380px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+  }
+  .signup-box p { margin: 0 0 10px; }
+  .signup-box label { display: block; margin-bottom: 4px; font-size: 14px; }
+  .signup-box input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+  }
+  .signup-box button {
+    margin-top: 12px;
+    padding: 8px 14px;
+  }
+  .errors { margin-bottom: 10px; color: #b42318; font-size: 14px; }
+  .help { margin-top: 10px; font-size: 14px; }
+  .help a { color: #0d6efd; text-decoration: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>회원가입</h1>
+<p>가입 후 관리자 승인 완료 시 로그인할 수 있습니다.</p>
+
+<form class="signup-box" method="post">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <div class="errors">{{ form.non_field_errors }}</div>
+  {% endif %}
+
+  <p>
+    {{ form.username.label_tag }}
+    {{ form.username }}
+    {% if form.username.errors %}<span class="errors">{{ form.username.errors }}</span>{% endif %}
+  </p>
+  <p>
+    {{ form.password1.label_tag }}
+    {{ form.password1 }}
+    {% if form.password1.errors %}<span class="errors">{{ form.password1.errors }}</span>{% endif %}
+  </p>
+  <p>
+    {{ form.password2.label_tag }}
+    {{ form.password2 }}
+    {% if form.password2.errors %}<span class="errors">{{ form.password2.errors }}</span>{% endif %}
+  </p>
+
+  <button type="submit">가입하기</button>
+  <p class="help">이미 계정이 있나요? <a href="{% url 'login' %}">로그인</a></p>
+</form>
+{% endblock %}

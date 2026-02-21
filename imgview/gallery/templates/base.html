@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}이미지 갤러리{% endblock %}</title>
+  <style>
+    :root {
+      --text: #222;
+      --border: #ddd;
+      --bg: #f7f7f7;
+      --accent: #0d6efd;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 16px 30px;
+    }
+
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .topbar-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      font-weight: 700;
+      text-decoration: none;
+      font-size: 20px;
+      background: linear-gradient(
+        90deg,
+        #ff3b30 0%,
+        #ff9500 18%,
+        #ffcc00 34%,
+        #34c759 50%,
+        #007aff 66%,
+        #5856d6 82%,
+        #af52de 100%
+      );
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .menu a {
+      text-decoration: none;
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+    }
+
+    .menu a:hover {
+      border-color: var(--border);
+      background: #fff;
+    }
+
+    .menu a.active {
+      color: #fff;
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .menu form { margin: 0; }
+    .menu button {
+      text-decoration: none;
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      background: transparent;
+      cursor: pointer;
+      font: inherit;
+    }
+    .menu button:hover {
+      border-color: var(--border);
+      background: #fff;
+    }
+    .user-name {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-wrap">
+        <a class="brand" href="{% url 'image_list' %}">MIDASCM</a>
+        {% if request.user.is_authenticated %}
+          <span class="user-name">{{ request.user.username }}</span>
+        {% endif %}
+      </div>
+      <nav class="menu">
+        <a href="{% url 'image_list' %}" class="{% if request.resolver_match.url_name == 'image_list' %}active{% endif %}">목록</a>
+        <a href="{% url 'image_upload' %}" class="{% if request.resolver_match.url_name == 'image_upload' %}active{% endif %}">업로드</a>
+        <a href="{% url 'category_list' %}" class="{% if request.resolver_match.url_name == 'category_list' or request.resolver_match.url_name == 'category_create' or request.resolver_match.url_name == 'category_update' or request.resolver_match.url_name == 'category_delete' %}active{% endif %}">분류관리</a>
+        {% if request.user.is_authenticated %}
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">로그아웃</button>
+          </form>
+        {% else %}
+          <a href="{% url 'signup' %}" class="{% if request.resolver_match.url_name == 'signup' %}active{% endif %}">회원가입</a>
+          <a href="{% url 'login' %}" class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}">로그인</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

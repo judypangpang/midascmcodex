@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ image.title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+  .slider-wrap {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    overflow: hidden;
+  }
+  .slider-view {
+    overflow: hidden;
+    width: 100%;
+  }
+  .slides {
+    display: flex;
+    transition: transform 0.35s ease;
+    will-change: transform;
+  }
+  .slide {
+    min-width: 100%;
+    padding: 14px;
+  }
+  .slide img {
+    width: 100%;
+    max-height: 560px;
+    object-fit: contain;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+  }
+  .meta { margin: 10px 0 0; color: #555; }
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 14px 14px;
+  }
+  .btn {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #fff;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  .counter { font-size: 14px; color: #555; }
+  .slide .actions { margin: 10px 0 0; }
+  .slide .link-btn {
+    display: inline-block;
+    text-decoration: none;
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+    border-radius: 6px;
+    padding: 6px 10px;
+    background: #fff;
+  }
+  .slide .delete-btn {
+    color: #b42318;
+    border-color: #b42318;
+    margin-left: 6px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>이미지 상세</h1>
+
+<div class="slider-wrap">
+  <div class="slider-view">
+    <div class="slides" id="slides">
+      {% for item in slides %}
+      <article class="slide">
+        <h2>{{ item.title }}</h2>
+        <img src="{{ item.image.url }}" alt="{{ item.title }}" />
+        <p class="meta">분류: {{ item.category|default:'미분류' }}</p>
+        <p class="meta">업로드 시간: {{ item.uploaded_at }}</p>
+        {% if request.user.is_authenticated %}
+        {% if perms.gallery.can_manage_all_images or request.user.id == item.created_by_id %}
+        <div class="actions">
+          <a class="link-btn" href="{% url 'image_update' item.pk %}">수정</a>
+          <a class="link-btn delete-btn" href="{% url 'image_delete' item.pk %}">삭제</a>
+          <a class="link-btn" href="{% url 'image_category_update' item.pk %}">분류 수정</a>
+        </div>
+        {% endif %}
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" type="button" id="prevBtn">이전</button>
+    <span class="counter" id="counter"></span>
+    <button class="btn" type="button" id="nextBtn">다음</button>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const slidesEl = document.getElementById('slides');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const counter = document.getElementById('counter');
+
+    if (!slidesEl || !prevBtn || !nextBtn || !counter) {
+      return;
+    }
+
+    const total = {{ slides|length }};
+    let index = {{ initial_index }};
+
+    function render() {
+      slidesEl.style.transform = `translateX(-${index * 100}%)`;
+      counter.textContent = `${index + 1} / ${total}`;
+      prevBtn.disabled = index === 0;
+      nextBtn.disabled = index === total - 1;
+    }
+
+    prevBtn.addEventListener('click', function () {
+      if (index > 0) {
+        index -= 1;
+        render();
+      }
+    });
+
+    nextBtn.addEventListener('click', function () {
+      if (index < total - 1) {
+        index += 1;
+        render();
+      }
+    });
+
+    render();
+  })();
+</script>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}분류 관리{% endblock %}
+
+{% block extra_head %}
+<style>
+  .actions { margin-bottom: 16px; }
+  .btn {
+    display: inline-block;
+    text-decoration: none;
+    color: #fff;
+    background: #0d6efd;
+    border: 1px solid #0d6efd;
+    border-radius: 6px;
+    padding: 8px 12px;
+  }
+  .table-wrap {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+  tr:last-child td { border-bottom: 0; }
+  .link { text-decoration: none; color: #0d6efd; margin-right: 8px; }
+  .danger { color: #b42318; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>분류 관리</h1>
+
+<div class="actions">
+  <a class="btn" href="{% url 'category_create' %}">분류 추가</a>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>이름</th>
+        <th>작성자</th>
+        <th>이미지 수</th>
+        <th>관리</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for category in categories %}
+      <tr>
+        <td>{{ category.name }}</td>
+        <td>{{ category.created_by|default:"-" }}</td>
+        <td>{{ category.image_count }}</td>
+        <td>
+          <a class="link" href="{% url 'category_update' category.pk %}">수정</a>
+          <a class="link danger" href="{% url 'category_delete' category.pk %}">삭제</a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="4">등록된 분류가 없습니다.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

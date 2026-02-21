@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}이미지 목록{% endblock %}
+
+{% block extra_head %}
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .filter-chip {
+    display: inline-block;
+    text-decoration: none;
+    color: #222;
+    border: 1px solid #ddd;
+    border-radius: 999px;
+    padding: 6px 12px;
+    background: #fff;
+  }
+  .filter-chip.active {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .card { border: 1px solid #ddd; border-radius: 8px; padding: 10px; background: #fff; }
+  .card img { width: 100%; height: 180px; object-fit: cover; border-radius: 6px; }
+  .card a { text-decoration: none; color: #222; }
+  .card > a { display: block; }
+  .card-actions { margin-top: 8px; }
+  .edit-link {
+    display: inline-block;
+    text-decoration: none;
+    color: #0d6efd;
+    font-size: 13px;
+    margin-right: 8px;
+  }
+  .delete-link {
+    display: inline-block;
+    text-decoration: none;
+    color: #b42318;
+    font-size: 13px;
+  }
+  .category-tag {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: #666;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>이미지 목록</h1>
+
+<div class="filters">
+  <a href="{% url 'image_list' %}" class="filter-chip {% if not selected_category_id %}active{% endif %}">전체</a>
+  {% for category in categories %}
+    <a href="{% url 'image_list' %}?category={{ category.id }}" class="filter-chip {% if selected_category_id == category.id|stringformat:'s' %}active{% endif %}">{{ category.name }}</a>
+  {% endfor %}
+</div>
+
+<div class="grid">
+  {% for item in images %}
+    <div class="card">
+      <a href="{% url 'image_detail' item.pk %}">
+        <img src="{{ item.image.url }}" alt="{{ item.title }}" />
+        <h3>{{ item.title }}</h3>
+        <span class="category-tag">분류: {{ item.category|default:'미분류' }}</span>
+      </a>
+      {% if request.user.is_authenticated %}
+      {% if perms.gallery.can_manage_all_images or request.user.id == item.created_by_id %}
+      <div class="card-actions">
+        <a class="edit-link" href="{% url 'image_update' item.pk %}">수정</a>
+        <a class="delete-link" href="{% url 'image_delete' item.pk %}">삭제</a>
+        <a class="edit-link" href="{% url 'image_category_update' item.pk %}">분류 수정</a>
+      </div>
+      {% endif %}
+      {% endif %}
+    </div>
+  {% empty %}
+    <p>업로드된 이미지가 없습니다.</p>
+  {% endfor %}
+</div>
+{% endblock %}

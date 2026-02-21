@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}분류 삭제{% endblock %}
+
+{% block extra_head %}
+<style>
+  .confirm-box {
+    max-width: 540px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+  }
+  .buttons { display: flex; gap: 8px; margin-top: 14px; }
+  .btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    cursor: pointer;
+    font: inherit;
+  }
+  .btn-danger { background: #b42318; border-color: #b42318; color: #fff; }
+  .btn-light { background: #fff; border-color: #ddd; color: #222; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>분류 삭제</h1>
+
+<div class="confirm-box">
+  <p><strong>{{ category.name }}</strong> 분류를 삭제하시겠습니까?</p>
+  <p>이 분류를 사용하던 이미지는 미분류 상태로 남습니다.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="buttons">
+      <button class="btn btn-danger" type="submit">삭제</button>
+      <a class="btn btn-light" href="{% url 'category_list' %}">취소</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

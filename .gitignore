@@ -1,0 +1,7 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.sqlite3
+imgview/db.sqlite3
+imgview/media/
+*.log

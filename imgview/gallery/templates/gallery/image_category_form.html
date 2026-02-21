@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}이미지 분류 수정{% endblock %}
+
+{% block extra_head %}
+<style>
+  .form-box {
+    max-width: 520px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+  }
+  .buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    cursor: pointer;
+    font: inherit;
+  }
+  .btn-primary { background: #0d6efd; border-color: #0d6efd; color: #fff; }
+  .btn-light { background: #fff; border-color: #ddd; color: #222; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>이미지 분류 수정</h1>
+<p>이미지: <strong>{{ image.title }}</strong></p>
+
+<form class="form-box" method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <div class="buttons">
+    <button class="btn btn-primary" type="submit">저장</button>
+    <a class="btn btn-light" href="{% url 'image_detail' image.pk %}">취소</a>
+  </div>
+</form>
+{% endblock %}
